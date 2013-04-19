@@ -2,6 +2,10 @@
 
 A simple debugging tool to visualize knockoutjs issues.
 
+##Screenshot
+
+![knockthrough screenshot](https://raw.github.com/JonKragh/knockthrough/master/screenshot.png)
+
 ##Usage
 
 ```javascript
