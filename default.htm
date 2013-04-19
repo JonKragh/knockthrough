@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Knockthrough sample HTML App</title>
+    
+    <!-- jquery and knockout-->
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.1.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+    
+    <!-- knockthrough -->
+    <script src="knockthrough.js"></script>
+    <link href="knockthrough.css" rel="stylesheet" />
+    <!-- knockthrough sample usage -->
+    <script src="app.js"></script>
+
+</head>
+<body>
+    <h1>Knockthrough Examples</h1>
+
+    <section>
+        <h2>Working Bindings</h2>
+        <p>First name: <strong data-bind="text: firstName"></strong></p>
+        <p>Last name: <strong data-bind="text: lastName"></strong></p>
+
+        <p>First name: <input data-bind="value: firstName" /></p>
+        <p>Last name: <input data-bind="value: lastName" /></p>
+
+        <p>Full name: <strong data-bind="text: fullName"></strong></p>
+
+    </section>
+    <section>
+        <h2>Broken Binding Examples</h2>
+        <p>
+            Click on the red boxes to see an issue.
+        </p>
+        <p>First name: <strong data-bind="text: UknownProperty"></strong></p>
+        <p>Last name: <strong data-bind="text: lastName + heyThisIsWrong()"></strong></p>
+
+        <p>First name: <input data-bind="value: UknownProperty" /></p>
+        <p>Last name: <input data-bind="value: lastName + heyThisIsWrong()" /></p>
+
+        <p>Full name: <strong data-bind="text: UknownProperty3"></strong></p>
+
+    </section>
+
+</body>
+</html>
