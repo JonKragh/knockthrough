@@ -1,6 +1,3 @@
-/// <reference path="knockthrough.ts" />
-var $;
-var ko;
 // This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
 function AppViewModel() {
     this.firstName = ko.observable("Bert");

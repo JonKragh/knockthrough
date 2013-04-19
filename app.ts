@@ -1,7 +1,7 @@
 /// <reference path="knockthrough.ts" />
 
-var $: any;
-var ko: any;
+declare var $: any;
+declare var ko: any;
 
 // This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
 function AppViewModel() {

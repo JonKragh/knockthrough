@@ -1,3 +1,7 @@
+// knockthrough JavaScript library v0.1.0
+// A utility to debug knockout js
+// (c) Proactive Logic Consulting, Inc - http://proactivelogic.com/
+// License: MIT (http://www.opensource.org/licenses/mit-license.php)
 var knockthrough;
 (function (knockthrough) {
     var monitorOptions = (function () {
@@ -21,15 +25,18 @@ var knockthrough;
     knockthrough.monitor = monitor;    
     var VisualBindingProvider = (function () {
         function VisualBindingProvider(ko) {
+            // error hover - these are styled in the knockthrough.css
             this.htmlErrorContainerId = "kt-error-container";
             this.htmlErrorMessageId = "kt-error-message";
             this.htmlContextDumpId = "kt-error-context-dump";
             this.htmlCloseButtonId = "kt-error-close-btn";
             this.originalBindingProvider = new ko.bindingProvider();
+            //determine if an element has any bindings
             this.nodeHasBindings = this.originalBindingProvider.nodeHasBindings;
             this.wireupErrorDialog();
         }
         VisualBindingProvider.prototype.wireupErrorDialog = function () {
+            // add the error container
             this.$errorMessage = $('<div>').attr("id", this.htmlErrorMessageId);
             this.$contextDump = $('<div>').attr("id", this.htmlContextDumpId);
             this.$closeButton = $('<a>x</a>').attr("id", this.htmlCloseButtonId);
@@ -65,12 +72,14 @@ var knockthrough;
             });
         };
         VisualBindingProvider.prototype.getBindings = function (node, bindingContext) {
+            //return the bindings given a node and the bindingContext
             var result;
             try  {
                 result = this.originalBindingProvider.getBindings(node, bindingContext);
             } catch (e) {
                 this.handleBindingError(node, e);
-            }
+                //throw e;
+                            }
             return result;
         };
         VisualBindingProvider.prototype.parseBindingsString = function (bindingsString, bindingContext, node) {
@@ -79,7 +88,8 @@ var knockthrough;
                 result = this.originalBindingProvider.parseBindingsString(bindingsString, bindingContext, node);
             } catch (e) {
                 this.handleBindingError(node, e);
-            }
+                //throw e;
+                            }
             return result;
         };
         VisualBindingProvider.prototype.handleBindingError = function (node, e) {
@@ -88,6 +98,7 @@ var knockthrough;
             errorNode.message = e.message;
             errorNode.description = e.description;
             errorNode.stack = e.stack;
+            // the data error
             $node.data("ktErrorDetails", errorNode);
         };
         return VisualBindingProvider;
