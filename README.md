@@ -10,6 +10,11 @@ Possibly more debugging tools and visualizations in the future.
 
 ##Usage
 
+- Reference the js and css files:
+  - knockthrough.js
+  - knockthrough.css
+ - Initialize knockthrough **before** you call ko.applyBindings
+
 ```javascript
 
 function AppViewModel() {
