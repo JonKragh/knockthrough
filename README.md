@@ -1,6 +1,8 @@
-#knockthrough
+#knockthrough.js
 
-A simple debugging tool to visualize knockoutjs issues.
+A simple debugging tool to visualize knockoutjs binding issues.  
+
+Possibly more debugging tools and visualizations in the future.
 
 ##Screenshot
 
