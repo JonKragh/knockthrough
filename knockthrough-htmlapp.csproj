@@ -16,6 +16,7 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="screenshot.png" />
     <TypeScriptCompile Include="app.ts" />
     <Content Include="app.js">
       <DependentUpon>app.ts</DependentUpon>
@@ -37,6 +38,10 @@
     <Content Include="app.js.map">
       <DependentUpon>app.ts</DependentUpon>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include="README.md" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

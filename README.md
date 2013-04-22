@@ -1,8 +1,19 @@
 #knockthrough.js
 
-A simple debugging tool to visualize knockoutjs binding issues.  
+A simple debugging tool for knockoutjs.  
 
-Possibly more debugging tools and visualizations in the future.
+Features:
+
+- **Binding Debugging** 
+ - catch and display binding errors
+ - highlights the element with the binding error
+ - shows the binding error message
+ - shows a datacontext dump for the element
+- **Debug Hidden Element Issues** 
+ - checkbox to display elements hidden by the "visible" binding
+ - shows the binding that hid the element
+ - shows a datacontext dump for the element
+
 
 [Test it out here](http://htmlpreview.github.io/?https://github.com/JonKragh/knockthrough/blob/master/default.htm)
  (click on the red boxes to see the broken bindings). 

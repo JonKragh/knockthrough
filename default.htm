@@ -45,5 +45,26 @@
 
     </section>
 
+    
+        <section>
+            <h2>Example of showing elements which are hidden by the "visible" binding</h2>
+            <p>
+                Click the "show elements hidden by visible bindings" checkbox to show hidden areas.
+            </p>
+            <p>
+                Then click on the yellow boxes to see the binding expression and the data context value for hte element.
+            </p>
+
+            <div data-bind="visible: lastName() == 'Kragh'">
+                This area is not hidden
+            </div>
+            
+            <div data-bind="visible: lastName() == 'Smith'">
+                This area is hidden based on the expression. Click on me to see the binding info.
+            </div>
+
+        </section>
+
+
 </body>
 </html>

@@ -1,7 +1,7 @@
 // This is a simple *viewmodel* - JavaScript that defines the data and behavior of your UI
 function AppViewModel() {
-    this.firstName = ko.observable("Bert");
-    this.lastName = ko.observable("Bertington");
+    this.firstName = ko.observable("Jon");
+    this.lastName = ko.observable("Kragh");
     this.fullName = ko.computed(function () {
         return this.firstName() + " " + this.lastName();
     }, this);

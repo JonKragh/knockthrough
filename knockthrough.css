@@ -7,9 +7,49 @@
     !important is used to override any existing styles
     so that you can see all errors    
 */
+
+/* toolbar */
+
+#kt-toolbar {
+    position: fixed;
+    width: 100%;
+    height: 70px;
+    background-color: #f7f7f7;
+    padding: 5px;
+    bottom: 0px;
+    left: 0;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+}
+#kt-logo {
+    margin: 10px 0 0 0;
+    
+    color: #666;
+    
+}
+    #kt-logo a
+    {
+        color: #2b40b7;
+    }
+
+/* visible element debugging */
+.kt-hidden-by-visible-binding {
+    background: #fff8d9 !important;
+    border: solid 2px #ffefad !important;
+    cursor: pointer;
+    margin: 5px; /* space out error nodes  */
+    min-width: 50px; /* make sure they are visible */
+    min-height: 14px;
+    display: inline-block;
+} 
+
+
+
+/* errors */
+
 .kt-error-node {
     background: #fadedd !important;
-    border: solid 2px  #dc241f !important;
+    border: solid 2px #dc241f !important;
     cursor: pointer;
     margin: 5px; /* space out error nodes  */
     min-width: 50px; /* make sure they are visible */
@@ -17,12 +57,11 @@
     display: inline-block;
 }
 
-.kt-error-node.selected {
-    background: #f4b9b7 !important;
-}
+.kt-error-node.selected { background: #f4b9b7 !important; }
 
 /* the hover error display */
-#kt-error-container {
+
+.kt-error-container {
     position: absolute;
     background: #fff;
     display: inline-block;
@@ -33,13 +72,13 @@
     max-width: 300px;
 }
 
-#kt-error-message {
+.kt-error-message {
     font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
     line-height: 1.6em;
 }
 
-#kt-error-context-dump {
+.kt-error-context-dump {
     font-family: Helvetica, Arial, sans-serif;
     clear: both;
     margin-top: 10px;
@@ -47,7 +86,7 @@
     padding: 5px;
 }
 
-#kt-error-close-btn {
+.kt-error-close-btn {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 16px;
@@ -59,7 +98,8 @@
 }
 
 /* json */
-#kt-error-context-dump pre {
+
+.kt-error-context-dump pre {
     background: transparent;
     font-size: 12px;
     line-height: 1.6em;
