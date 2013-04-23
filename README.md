@@ -19,6 +19,7 @@ Features:
  - select your active view model in the knockthrough toolbar
  - does a json dump of the view models state
  - supports multiple view models per page
+- **Typescript & Javascript Version** 
 
 
 [Test it out here](http://htmlpreview.github.io/?https://github.com/JonKragh/knockthrough/blob/master/default.htm)
