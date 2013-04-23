@@ -1,6 +1,8 @@
 #knockthrough.js
 
-A simple debugging tool for knockoutjs.  
+A simple debugging tool for knockoutjs.  I'm adding features as I debug various Single Page Apps I'm building.
+
+Tweet me with issues: [@jonkragh](https://twitter.com/jonkragh)
 
 Features:
 
@@ -13,6 +15,10 @@ Features:
  - checkbox to display elements hidden by the "visible" binding
  - shows the binding that hid the element
  - shows a datacontext dump for the element
+- **View Model Dump / Visibility** 
+ - select your active view model in the knockthrough toolbar
+ - does a json dump of the view models state
+ - supports multiple view models per page
 
 
 [Test it out here](http://htmlpreview.github.io/?https://github.com/JonKragh/knockthrough/blob/master/default.htm)
