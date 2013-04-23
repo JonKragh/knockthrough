@@ -1,4 +1,4 @@
-// knockthrough JavaScript library v0.1.1
+// knockthrough JavaScript library v0.1.2
 // A utility to debug knockout js
 // (c) Proactive Logic Consulting, Inc - http://proactivelogic.com/
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -53,14 +53,28 @@ module knockthrough {
         public Message: string = null;
         public KoData: any = null;
 
-        public show(top, left) {
-            
-            var dataStr = JSON.stringify((ko.toJS(this.KoData)), null, 2);
+        public showSmall(top, left) {
+
+
+            this.$container.css({ 'top': top, 'left': left });
+            this.show();
+        }
+        private show() {
+
+
+            var dataStr = JSON.stringify((ko.mapping.toJS(this.KoData, {
+                'ignore': ["__ko_mapping__"]
+            })), null, 2);
 
             this.$message.text(this.Message);
 
             this.$contextDump.html("<pre>" + dataStr + "</pre>");
-            this.$container.css({ 'top': top, 'left': left }).show();
+            this.$container.show();
+        }
+
+        public showFullScreen() {
+            this.$container.css({ 'top': 10, 'left': 10, 'width': ($(window).width() - 100) + "px", 'height': ($(window).height() - 150) + "px" });
+            this.show();
         }
 
         public close() {
@@ -73,23 +87,80 @@ module knockthrough {
         _options: monitorOptions;
 
         hiddenByVisibleBindingClassName: string = "kt-hidden-by-visible-binding";
+        $boundModelSelect: any = null;
+        selectedModel: any = null;
 
         constructor(public options: monitorOptions) {
             this._options = options;
             var bp = new VisualBindingProvider(this._options.ko);
             this._options.ko.bindingProvider.instance = bp;
-            
+
             this.wireupVisibleMonitor(options);
             this.createToolBar();
+            this.watchApplyBindings();
         }
 
+        // track all models bound with ko.applyBindings
+        watchApplyBindings() {
+            var that = this;
+
+            var origApplyBindings = ko.applyBindings;
+            var count = 1;
+            // override knockouts applybindings - gotta love js
+            ko.applyBindings = function (viewModel, rootNode) {
+                // call the original
+                origApplyBindings(viewModel, rootNode);
+                var thisCount = count;
+                $("<option>").text("bound model #" + thisCount).data("kt-bound-model", viewModel).appendTo(that.$boundModelSelect);
+                if (that.selectedModel === null) {
+                    that.selectedModel = viewModel;
+                }
+                count = count + 1;
+            }
+
+        }
+
+
         createToolBar() {
-            
+            var that = this;
+
             var $toolbar = $("<div>").attr("id", "kt-toolbar");
+
+            // hidden elements
             var $showHiddenCheckBox = $('<input id="kt-toolbar-show-hidden-checkbox" type="checkbox" />');
             $toolbar.append($showHiddenCheckBox);
             $toolbar.append('<label for="kt-toolbar-show-hidden-checkbox">show elements hidden by visible bindings</label>');
-            var $logo = $("<div>").attr("id", "kt-logo").append('<a href="https://github.com/JonKragh/knockthrough">knockthrough.js</a> by <a href="http://www.JonKragh.com">Jon Kragh</a>');
+
+            // select a view model
+            this.$boundModelSelect = $("<select>");
+            this.$boundModelSelect.change(function (e) {
+
+                var $selectedOption = that.$boundModelSelect.find(":selected");
+                that.selectedModel = $selectedOption.data("kt-bound-model");
+            });
+
+            
+
+            // dump model
+            var $dumpModelCont = $("<div>").attr("id", "kt-dump-model-cont");
+
+            
+
+            var $dumpModelLink = $("<a href='#'>").attr("id","kt-dump-model-link").text("dump model").appendTo($toolbar);
+            $dumpModelLink.click(function (e) {
+                that.dumpViewModel();
+                e.preventDefault();
+
+            });
+
+            $dumpModelCont.append(this.$boundModelSelect);
+            $dumpModelCont.append($dumpModelLink);
+
+            $toolbar.append($dumpModelCont);
+
+            // logo
+            var $logo = $("<div>").attr("id", "kt-logo").append('<a href="https://github.com/JonKragh/knockthrough">knockthrough.js</a> <span>v0.1.2</span> by <a href="http://www.JonKragh.com">Jon Kragh</a>');
+
             $toolbar.append($logo);
             $toolbar.appendTo("body");
 
@@ -97,10 +168,21 @@ module knockthrough {
 
             $showHiddenCheckBox.click(function (e) {
                 var isChecked = $(e.target).is(":checked");
-                $("." + that.hiddenByVisibleBindingClassName).each(function() {
+                $("." + that.hiddenByVisibleBindingClassName).each(function () {
                     $(this).toggle(isChecked);
                 });
             });
+        }
+
+        dumpViewModel() {
+            if (this.selectedModel) {
+                var dialog = new MonitorDialog();
+                dialog.Message = "Model Dump";
+                dialog.KoData = this.selectedModel;
+                //dialog.show(Math.floor(window.innerHeight / 2), Math.floor(window.innerWidth / 2));
+                dialog.showFullScreen();
+
+            }
         }
 
         wireupVisibleMonitor(options: monitorOptions) {
@@ -112,7 +194,7 @@ module knockthrough {
                 update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
                     var value = valueAccessor();
                     var wasVisible = !(element.style.display == "none");
-                   
+
                     origVisibleHandler.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
 
                     var isVisible = !(element.style.display == "none");
@@ -128,7 +210,7 @@ module knockthrough {
                         else {
                             // add to hidden element list
                             var hidden = element;
-                            
+
                             $element.addClass(that.hiddenByVisibleBindingClassName);
                         }
                     }
@@ -149,11 +231,11 @@ module knockthrough {
                     return;
                 }
 
-                
+
                 var dialog = new MonitorDialog();
                 dialog.Message = "binding: " + $e.attr("data-bind");
                 dialog.KoData = ko.dataFor($e[0]);
-                dialog.show(e.pageY, e.pageX);
+                dialog.showSmall(e.pageY, e.pageX);
                 $e.data("kt-dialog-instance", dialog);
 
             });
@@ -182,7 +264,7 @@ module knockthrough {
         }
 
         wireupErrorDialog() {
-            
+
             var that = this;
             $(document).on("click", ".kt-error-node", function (e) {
 
@@ -207,17 +289,17 @@ module knockthrough {
                 var errorDetails = <ErrorNode>$e.data("ktErrorDetails");
                 if (!errorDetails) return;
 
-                
+
                 var dialog = new MonitorDialog();
                 dialog.Message = errorDetails.message;
                 dialog.KoData = ko.dataFor($e[0]);
-                dialog.show(e.pageY, e.pageX);
-                
+                dialog.showSmall(e.pageY, e.pageX);
+
                 $e.data("kt-dialog-instance", dialog);
 
             });
 
-            
+
         }
 
         nodeHasBindings(node) {
@@ -264,7 +346,7 @@ module knockthrough {
             $node.data("ktErrorDetails", errorNode);
         }
 
-        
+
     };
 
 }

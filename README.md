@@ -29,6 +29,11 @@ Features:
   - knockthrough.css
  - Initialize knockthrough **before** you call ko.applyBindings
 
+##Dependencies
+- jQuery
+- Knockout JS
+- Knockout Mapping Plugin
+
 ```javascript
 
 // sample view model

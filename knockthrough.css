@@ -13,7 +13,7 @@
 #kt-toolbar {
     position: fixed;
     width: 100%;
-    height: 70px;
+    height: 100px;
     background-color: #f7f7f7;
     padding: 5px;
     bottom: 0px;
@@ -30,6 +30,17 @@
     #kt-logo a
     {
         color: #2b40b7;
+    }
+
+    #kt-dump-model-cont {
+        padding: 5px;
+        background: #ddd;
+        float: right;
+        margin-right: 10px;
+    }
+
+    #kt-dump-model-link {
+        margin-left: 10px;
     }
 
 /* visible element debugging */
@@ -69,7 +80,7 @@
     z-index: 9999;
     border-radius: 10px;
     border: solid 3px #ddd;
-    max-width: 300px;
+    overflow-y: scroll;
 }
 
 .kt-error-message {
@@ -84,6 +95,8 @@
     margin-top: 10px;
     background: #f7f7f7;
     padding: 5px;
+    
+    
 }
 
 .kt-error-close-btn {

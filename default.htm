@@ -7,8 +7,10 @@
     
     <!-- jquery and knockout-->
     <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.1.js"></script>
-    <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
     
+    <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+    <script src="lib/knockout.mapping.js"></script>
+
     <!-- knockthrough -->
     <script src="knockthrough.js"></script>
     <link href="knockthrough.css" rel="stylesheet" />
@@ -18,7 +20,8 @@
 </head>
 <body>
     <h1>Knockthrough Examples</h1>
-
+    
+    <div id="view-modal-1">
     <section>
         <h2>Working Bindings</h2>
         <p>First name: <strong data-bind="text: firstName"></strong></p>
@@ -64,7 +67,21 @@
             </div>
 
         </section>
+        </div>
+    
+    <div id="view-modal-2">
+    <section>
+        <h2>A Second View Modal on the PAge</h2>
+        <p>First name: <strong data-bind="text: firstName"></strong></p>
+        <p>Last name: <strong data-bind="text: lastName"></strong></p>
 
+        <p>First name: <input data-bind="value: firstName" /></p>
+        <p>Last name: <input data-bind="value: lastName" /></p>
+
+        <p>Full name: <strong data-bind="text: fullName"></strong></p>
+
+    </section>
+    </div>
 
 </body>
 </html>

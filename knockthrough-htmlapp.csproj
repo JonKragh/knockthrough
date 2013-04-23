@@ -16,6 +16,7 @@
     <IISExpressUseClassicPipelineMode />
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="lib\knockout.mapping.js" />
     <Content Include="screenshot.png" />
     <TypeScriptCompile Include="app.ts" />
     <Content Include="app.js">
