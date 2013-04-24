@@ -83,13 +83,14 @@ var knockthrough;
     var ModelWatchNode = (function () {
         function ModelWatchNode(node, parentName, callback) {
             this.watchedNodes = [];
+            var that = this;
             for(var prop in node) {
                 if(ko.isObservable(node[prop])) {
                     ((function () {
                         var currentValue = node[prop]();
                         var propName = prop;
                         node[prop].subscribe(function (newValue) {
-                            var alertText = parentName + "." + propName + ": " + currentValue + " to: " + newValue;
+                            var alertText = Date() + " - <span class='kt-watch-data-point-name'>" + parentName + "." + propName + "</span> [from: <span class='kt-watch-data-point-from'>" + currentValue + "</span> to: " + "<span class='kt-watch-data-point-to'>" + newValue + "</span>]";
                             currentValue = newValue;
                             callback(alertText);
                         });
@@ -140,7 +141,7 @@ var knockthrough;
                 }
                 count = count + 1;
                 var modelWatch = new ModelWatch(viewModel, name, function (message) {
-                    that.$watchList.prepend($("<li>").text(message));
+                    that.$watchList.prepend($("<li>").html(message));
                 });
                 that.WatchedModels.push(modelWatch);
             };

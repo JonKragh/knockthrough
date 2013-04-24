@@ -72,19 +72,46 @@
 
 /* watch */
 #kt-watch-select-list {
-    
+    height: 200px;
     overflow-y: scroll;
+    
+    padding: 0;
+    margin: 0;
+    font-family: Arial, sans-serif;
 }
 
 #kt-watch-select-list ul {
     list-style: none;
-    font-size: 11px;    
+    list-style-type: none;
+    font-size: 11px;
+    padding: 0;
+    margin: 0; 
 }
 #kt-watch-select-list li {
     display: block;
     border-bottom: solid 1px #ddd;
-    padding: 3px 0;
+    padding: 5px 0;
+    margin: 0;
+    color: #999;
+}
+.kt-watch-data-point-name {
+    font-weight: bold;
+    color: #666;
+}
+.kt-watch-data-point-from {
+    font-weight: bold;
     
+    
+    background: #868f98;
+    color: #fff;
+    padding: 3px 10px;
+}
+.kt-watch-data-point-to {
+    font-weight: bold;
+    
+    background: #91bb4d;
+    color: #fff;
+    padding: 3px 10px;
 }
 
 /* errors */

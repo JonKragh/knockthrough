@@ -75,7 +75,7 @@ module knockthrough {
             var that = this;
             $("body").click(function (e) {
                 var $target = $(e.target);
-                
+
                 // ignore clicks on the dialog
                 if ($target.hasClass(that.htmlErrorContainerClass)) return;
                 if ($target.closest("." + that.htmlErrorContainerClass).length > 0) return;
@@ -94,11 +94,11 @@ module knockthrough {
     }
 
 
-    export class ModelWatch{
+    export class ModelWatch {
 
         rootWatchNode: ModelWatchNode;
         constructor(model, parentName, callback) {
-            
+
             if (!parentName) {
                 parentName = "root";
             }
@@ -110,16 +110,16 @@ module knockthrough {
         watchedNodes: ModelWatchNode[] = [];
 
         constructor(node, parentName, callback) {
-
+            var that = this;
             for (var prop in node) {
                 if (ko.isObservable(node[prop])) {
-                    
+
                     (function() {
                         var currentValue = node[prop]();
                         var propName = prop;
 
                         node[prop].subscribe(function (newValue) {
-                            var alertText = parentName + "." + propName + ": " + currentValue + " to: " + newValue;
+                            var alertText = Date() + " - <span class='kt-watch-data-point-name'>" + parentName + "." + propName + "</span> [from: <span class='kt-watch-data-point-from'>" + currentValue + "</span> to: " + "<span class='kt-watch-data-point-to'>" + newValue + "</span>]";
 
                             currentValue = newValue;
                             callback(alertText);
@@ -136,9 +136,11 @@ module knockthrough {
                     }
                     this.watchedNodes.push(child);
                 }
-                
+
             }
         }
+
+
     }
 
     export class monitor {
@@ -156,17 +158,17 @@ module knockthrough {
             this._options.ko.bindingProvider.instance = bp;
 
             this.wireupVisibleMonitor(options);
-            
+
             this.createToolBar();
             this.watchApplyBindings();
-            
+
         }
 
         handleObservableChange(oldValue, newValue) {
             var test = oldValue + newValue;
 
         }
-        
+
         // track all models bound with ko.applyBindings
 
         WatchedModels: ModelWatch[] = [];
@@ -182,14 +184,14 @@ module knockthrough {
                 origApplyBindings(viewModel, rootNode);
                 var thisCount = count;
                 var name = that.getModelName(viewModel);
-                $("<option>").text("bound model #" + thisCount + " [" + name  + "]").data("kt-bound-model", viewModel).appendTo(that.$boundModelSelect);
+                $("<option>").text("bound model #" + thisCount + " [" + name + "]").data("kt-bound-model", viewModel).appendTo(that.$boundModelSelect);
                 if (that.selectedModel === null) {
                     that.selectedModel = viewModel;
                 }
                 count = count + 1;
                 //var dirtyMonitor = new DirtyMonitor(viewModel);
                 var modelWatch = new ModelWatch(viewModel, name, function (message) {
-                    that.$watchList.prepend($("<li>").text(message));
+                    that.$watchList.prepend($("<li>").html(message));
                 });
                 that.WatchedModels.push(modelWatch);
             }
@@ -203,14 +205,14 @@ module knockthrough {
         }
 
         createToolBar() {
-            
+
             var that = this;
             var $left = $("<div>").attr("id", "kt-toolbar-left");
             var $right = $("<div>").attr("id", "kt-toolbar-right");
 
             var $toolbar = $("<div>").attr("id", "kt-toolbar");
 
-            
+
             //// select a view model
             this.$boundModelSelect = $("<select>");
             this.$boundModelSelect.change(function (e) {
@@ -233,7 +235,7 @@ module knockthrough {
             $dumpModelCont.append($dumpModelLink);
 
             $right.append($dumpModelCont);
-            
+
             //// hidden elements
             var $showHiddenCont = $("<div>").attr("id", "kt-toolbar-show-hidden-cont");
 
