@@ -13,7 +13,7 @@
 #kt-toolbar {
     position: fixed;
     width: 100%;
-    height: 100px;
+    height: 200px;
     background-color: #f7f7f7;
     padding: 5px;
     bottom: 0px;
@@ -21,6 +21,17 @@
     font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
 }
+#kt-toolbar-left {
+    float: left;
+    width: 70%
+}
+#kt-toolbar-right {
+    float: right;
+    width: 25%;
+    text-align: right;
+    padding-right: 20px;
+}
+
 #kt-logo {
     margin: 10px 0 0 0;
     
@@ -34,15 +45,20 @@
 
     #kt-dump-model-cont {
         padding: 5px;
-        background: #ddd;
+        background: #eee;
         float: right;
-        margin-right: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px; 
     }
 
     #kt-dump-model-link {
         margin-left: 10px;
+        display: block;
     }
 
+    #kt-toolbar-show-hidden-cont {
+        clear: both;
+    }
 /* visible element debugging */
 .kt-hidden-by-visible-binding {
     background: #fff8d9 !important;
@@ -54,7 +70,22 @@
     display: inline-block;
 } 
 
+/* watch */
+#kt-watch-select-list {
+    
+    overflow-y: scroll;
+}
 
+#kt-watch-select-list ul {
+    list-style: none;
+    font-size: 11px;    
+}
+#kt-watch-select-list li {
+    display: block;
+    border-bottom: solid 1px #ddd;
+    padding: 3px 0;
+    
+}
 
 /* errors */
 

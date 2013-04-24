@@ -31,7 +31,10 @@
         <p>Last name: <input data-bind="value: lastName" /></p>
 
         <p>Full name: <strong data-bind="text: fullName"></strong></p>
-
+        <div data-bind="with: ChildAppViewModel">
+            <h3>Child View model</h3>
+            <p>Occupation: <input data-bind="value: occupation" /></p>
+        </div>
     </section>
     <section>
         <h2>Broken Binding Examples</h2>
@@ -71,7 +74,7 @@
     
     <div id="view-modal-2">
     <section>
-        <h2>A Second View Modal on the PAge</h2>
+        <h2>A Second View Modal on the Page</h2>
         <p>First name: <strong data-bind="text: firstName"></strong></p>
         <p>Last name: <strong data-bind="text: lastName"></strong></p>
 

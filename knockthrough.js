@@ -24,7 +24,7 @@ var knockthrough;
             this.$closeButton = $('<a>x</a>').addClass(this.htmlCloseButtonClass);
             this.$container = $('<div></div>').addClass(this.htmlErrorContainerClass).addClass("kt-error-hover").append("").append(this.$closeButton).append(this.$message).append(this.$contextDump).hide().appendTo("body");
             this.$closeButton.click(function () {
-                that.$container.hide();
+                that.close();
             });
         }
         MonitorDialog.prototype.showSmall = function (top, left) {
@@ -43,28 +43,79 @@ var knockthrough;
             this.$message.text(this.Message);
             this.$contextDump.html("<pre>" + dataStr + "</pre>");
             this.$container.show();
+            var that = this;
+            $("body").click(function (e) {
+                var $target = $(e.target);
+                if($target.hasClass(that.htmlErrorContainerClass)) {
+                    return;
+                }
+                if($target.closest("." + that.htmlErrorContainerClass).length > 0) {
+                    return;
+                }
+                that.close();
+            });
         };
         MonitorDialog.prototype.showFullScreen = function () {
             this.$container.css({
                 'top': 10,
-                'left': 10,
-                'width': ($(window).width() - 100) + "px",
-                'height': ($(window).height() - 150) + "px"
+                'left': 100,
+                'width': ($(window).width() - 200) + "px",
+                'height': ($(window).height() - 200) + "px"
             });
             this.show();
         };
         MonitorDialog.prototype.close = function () {
-            this.$container.hide();
+            this.$container.remove();
         };
         return MonitorDialog;
     })();
     knockthrough.MonitorDialog = MonitorDialog;    
+    var ModelWatch = (function () {
+        function ModelWatch(model, parentName, callback) {
+            if(!parentName) {
+                parentName = "root";
+            }
+            this.rootWatchNode = new ModelWatchNode(model, parentName, callback);
+        }
+        return ModelWatch;
+    })();
+    knockthrough.ModelWatch = ModelWatch;    
+    var ModelWatchNode = (function () {
+        function ModelWatchNode(node, parentName, callback) {
+            this.watchedNodes = [];
+            for(var prop in node) {
+                if(ko.isObservable(node[prop])) {
+                    ((function () {
+                        var currentValue = node[prop]();
+                        var propName = prop;
+                        node[prop].subscribe(function (newValue) {
+                            var alertText = parentName + "." + propName + ": " + currentValue + " to: " + newValue;
+                            currentValue = newValue;
+                            callback(alertText);
+                        });
+                    })());
+                    var child = new ModelWatchNode(node[prop](), parentName + "." + prop, callback);
+                    this.watchedNodes.push(child);
+                } else {
+                    var propValue = node[prop];
+                    if(typeof propValue === 'object') {
+                        var child = new ModelWatchNode(propValue, parentName + "." + prop, callback);
+                    }
+                    this.watchedNodes.push(child);
+                }
+            }
+        }
+        return ModelWatchNode;
+    })();
+    knockthrough.ModelWatchNode = ModelWatchNode;    
     var monitor = (function () {
         function monitor(options) {
             this.options = options;
             this.hiddenByVisibleBindingClassName = "kt-hidden-by-visible-binding";
             this.$boundModelSelect = null;
+            this.$watchList = null;
             this.selectedModel = null;
+            this.WatchedModels = [];
             this._options = options;
             var bp = new VisualBindingProvider(this._options.ko);
             this._options.ko.bindingProvider.instance = bp;
@@ -72,6 +123,9 @@ var knockthrough;
             this.createToolBar();
             this.watchApplyBindings();
         }
+        monitor.prototype.handleObservableChange = function (oldValue, newValue) {
+            var test = oldValue + newValue;
+        };
         monitor.prototype.watchApplyBindings = function () {
             var that = this;
             var origApplyBindings = ko.applyBindings;
@@ -79,35 +133,54 @@ var knockthrough;
             ko.applyBindings = function (viewModel, rootNode) {
                 origApplyBindings(viewModel, rootNode);
                 var thisCount = count;
-                $("<option>").text("bound model #" + thisCount).data("kt-bound-model", viewModel).appendTo(that.$boundModelSelect);
+                var name = that.getModelName(viewModel);
+                $("<option>").text("bound model #" + thisCount + " [" + name + "]").data("kt-bound-model", viewModel).appendTo(that.$boundModelSelect);
                 if(that.selectedModel === null) {
                     that.selectedModel = viewModel;
                 }
                 count = count + 1;
+                var modelWatch = new ModelWatch(viewModel, name, function (message) {
+                    that.$watchList.prepend($("<li>").text(message));
+                });
+                that.WatchedModels.push(modelWatch);
             };
+        };
+        monitor.prototype.getModelName = function (obj) {
+            var funcNameRegex = /function (.{1,})\(/;
+            var results = (funcNameRegex).exec((obj).constructor.toString());
+            return (results && results.length > 1) ? results[1] : "";
         };
         monitor.prototype.createToolBar = function () {
             var that = this;
+            var $left = $("<div>").attr("id", "kt-toolbar-left");
+            var $right = $("<div>").attr("id", "kt-toolbar-right");
             var $toolbar = $("<div>").attr("id", "kt-toolbar");
-            var $showHiddenCheckBox = $('<input id="kt-toolbar-show-hidden-checkbox" type="checkbox" />');
-            $toolbar.append($showHiddenCheckBox);
-            $toolbar.append('<label for="kt-toolbar-show-hidden-checkbox">show elements hidden by visible bindings</label>');
             this.$boundModelSelect = $("<select>");
             this.$boundModelSelect.change(function (e) {
                 var $selectedOption = that.$boundModelSelect.find(":selected");
                 that.selectedModel = $selectedOption.data("kt-bound-model");
             });
             var $dumpModelCont = $("<div>").attr("id", "kt-dump-model-cont");
-            var $dumpModelLink = $("<a href='#'>").attr("id", "kt-dump-model-link").text("dump model").appendTo($toolbar);
+            var $dumpModelLink = $("<a href='#'>").attr("id", "kt-dump-model-link").text("dump model").appendTo($dumpModelCont);
             $dumpModelLink.click(function (e) {
                 that.dumpViewModel();
                 e.preventDefault();
+                e.stopPropagation();
             });
             $dumpModelCont.append(this.$boundModelSelect);
             $dumpModelCont.append($dumpModelLink);
-            $toolbar.append($dumpModelCont);
-            var $logo = $("<div>").attr("id", "kt-logo").append('<a href="https://github.com/JonKragh/knockthrough">knockthrough.js</a> <span>v0.1.2</span> by <a href="http://www.JonKragh.com">Jon Kragh</a>');
-            $toolbar.append($logo);
+            $right.append($dumpModelCont);
+            var $showHiddenCont = $("<div>").attr("id", "kt-toolbar-show-hidden-cont");
+            var $showHiddenCheckBox = $('<input id="kt-toolbar-show-hidden-checkbox" type="checkbox" />');
+            $showHiddenCont.append($showHiddenCheckBox);
+            $showHiddenCont.append('<label for="kt-toolbar-show-hidden-checkbox">show elements hidden by visible bindings</label>');
+            $right.append($showHiddenCont);
+            this.$watchList = $("<ul>").attr("id", "kt-watch-select-list");
+            $left.append(this.$watchList);
+            var $logo = $("<div>").attr("id", "kt-logo").append('<a href="https://github.com/JonKragh/knockthrough">knockthrough.js</a> <span>v0.1.3</span> by <a href="http://www.JonKragh.com">Jon Kragh</a>');
+            $right.append($logo);
+            $toolbar.append($left);
+            $toolbar.append($right);
             $toolbar.appendTo("body");
             var that = this;
             $showHiddenCheckBox.click(function (e) {
