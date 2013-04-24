@@ -19,15 +19,22 @@ Features:
  - select your active view model in the knockthrough toolbar
  - does a json dump of the view models state
  - supports multiple view models per page
+- **Observable Change Log** 
+ - Logs all observable property changes
+
 - **Typescript & Javascript Version** 
 
 
 [Test it out here](http://htmlpreview.github.io/?https://github.com/JonKragh/knockthrough/blob/master/default.htm)
  (click on the red boxes to see the broken bindings). 
 
-##Screenshot
+##Screenshots
 
 ![knockthrough screenshot](https://raw.github.com/JonKragh/knockthrough/master/screenshot.png)
+
+![knockthrough binding logger screenshot](https://raw.github.com/JonKragh/knockthrough/master/model-log-screenshot.png)
+
+
 
 ##Usage
 
