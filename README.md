@@ -30,11 +30,14 @@ Features:
 
 ##Screenshots
 
+##Binding Debugging
 ![knockthrough screenshot](https://raw.github.com/JonKragh/knockthrough/master/screenshot.png)
 
+## Observable Property Change Log
 ![knockthrough binding logger screenshot](https://raw.github.com/JonKragh/knockthrough/master/model-log-screenshot.png)
 
-
+## Model Dumps
+![knockthrough binding logger screenshot](https://raw.github.com/JonKragh/knockthrough/master/model-log-screenshot-model-dump.png)
 
 ##Usage
 
