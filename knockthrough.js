@@ -89,8 +89,9 @@ var knockthrough;
                     ((function () {
                         var currentValue = node[prop]();
                         var propName = prop;
+                        var time = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
                         node[prop].subscribe(function (newValue) {
-                            var alertText = Date() + " - <span class='kt-watch-data-point-name'>" + parentName + "." + propName + "</span> [from: <span class='kt-watch-data-point-from'>" + currentValue + "</span> to: " + "<span class='kt-watch-data-point-to'>" + newValue + "</span>]";
+                            var alertText = time + " - <span class='kt-watch-data-point-name'>" + parentName + "." + propName + "</span> [from: <span class='kt-watch-data-point-from'>" + currentValue + "</span> to: " + "<span class='kt-watch-data-point-to'>" + newValue + "</span>]";
                             currentValue = newValue;
                             callback(alertText);
                         });
