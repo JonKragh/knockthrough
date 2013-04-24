@@ -37,7 +37,7 @@ Features:
 ![knockthrough binding logger screenshot](https://raw.github.com/JonKragh/knockthrough/master/model-log-screenshot.png)
 
 ## Model Dumps
-![knockthrough binding logger screenshot](https://raw.github.com/JonKragh/knockthrough/master/model-log-screenshot-model-dump.png)
+![knockthrough binding logger screenshot](https://raw.github.com/JonKragh/knockthrough/master/screenshot-model-dump.png)
 
 ##Usage
 
