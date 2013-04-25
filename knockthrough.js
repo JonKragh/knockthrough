@@ -1,7 +1,10 @@
 var knockthrough;
 (function (knockthrough) {
     var monitorOptions = (function () {
-        function monitorOptions() { }
+        function monitorOptions() {
+            this.enableObservableWatch = true;
+            this.logEntries = 200;
+        }
         return monitorOptions;
     })();
     knockthrough.monitorOptions = monitorOptions;    
@@ -35,11 +38,9 @@ var knockthrough;
             this.show();
         };
         MonitorDialog.prototype.show = function () {
-            var dataStr = JSON.stringify((ko.mapping.toJS(this.KoData, {
-                'ignore': [
-                    "__ko_mapping__"
-                ]
-            })), null, 2);
+            var dataStr = JSON.stringify(ko.toJS(this.KoData), function (key, val) {
+                return key === '__ko_mapping__' ? undefined : val;
+            }, 2);
             this.$message.text(this.Message);
             this.$contextDump.html("<pre>" + dataStr + "</pre>");
             this.$container.show();
@@ -85,13 +86,31 @@ var knockthrough;
             this.watchedNodes = [];
             var that = this;
             for(var prop in node) {
+                if(!node.hasOwnProperty(prop)) {
+                    continue;
+                }
+                if(prop === "ko") {
+                    continue;
+                }
+                if(prop === "$root") {
+                    continue;
+                }
+                if(prop === "$parents") {
+                    continue;
+                }
+                if(prop === "$parent") {
+                    continue;
+                }
+                if(prop === "$parentContext") {
+                    continue;
+                }
                 if(ko.isObservable(node[prop])) {
                     ((function () {
                         var currentValue = node[prop]();
                         var propName = prop;
                         var time = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
                         node[prop].subscribe(function (newValue) {
-                            var alertText = time + " - <span class='kt-watch-data-point-name'>" + parentName + "." + propName + "</span> [from: <span class='kt-watch-data-point-from'>" + currentValue + "</span> to: " + "<span class='kt-watch-data-point-to'>" + newValue + "</span>]";
+                            var alertText = time + " - " + "<span class='kt-watch-data-point-name'>" + parentName + "." + propName + "</span>" + "<span class='kt-watch-data-points'>[from: <span class='kt-watch-data-point-from'>" + currentValue + "</span> to: " + "<span class='kt-watch-data-point-to'>" + newValue + "</span>]</span>";
                             currentValue = newValue;
                             callback(alertText);
                         });
@@ -130,6 +149,7 @@ var knockthrough;
         };
         monitor.prototype.watchApplyBindings = function () {
             var that = this;
+            var addedCount = 0;
             var origApplyBindings = ko.applyBindings;
             var count = 1;
             ko.applyBindings = function (viewModel, rootNode) {
@@ -141,10 +161,17 @@ var knockthrough;
                     that.selectedModel = viewModel;
                 }
                 count = count + 1;
-                var modelWatch = new ModelWatch(viewModel, name, function (message) {
-                    that.$watchList.prepend($("<li>").html(message));
-                });
-                that.WatchedModels.push(modelWatch);
+                if(that._options.enableObservableWatch) {
+                    var modelWatch = new ModelWatch(viewModel, name, function (message) {
+                        addedCount++;
+                        if(addedCount > that._options.logEntries) {
+                            var last = that.$watchList.find("li:last-child");
+                            last.remove();
+                        }
+                        that.$watchList.prepend("<li>" + message + "</li>");
+                    });
+                    that.WatchedModels.push(modelWatch);
+                }
             };
         };
         monitor.prototype.getModelName = function (obj) {
@@ -156,7 +183,22 @@ var knockthrough;
             var that = this;
             var $left = $("<div>").attr("id", "kt-toolbar-left");
             var $right = $("<div>").attr("id", "kt-toolbar-right");
+            var $hideToolbarLink = $("<a id='kt-hide-toolbar-link' href='#'>minimize</a>");
+            $right.append($hideToolbarLink);
             var $toolbar = $("<div>").attr("id", "kt-toolbar");
+            var $showToolbarLink = $("<a id='kt-show-toolbar-link' href='#'>knockthrough.js</a>");
+            var $toolbarHidden = $("<div>").attr("id", "kt-toolbar-hidden").append($showToolbarLink).hide();
+            $toolbarHidden.appendTo("body");
+            $showToolbarLink.click(function (e) {
+                e.preventDefault();
+                $toolbarHidden.hide();
+                $toolbar.show();
+            });
+            $hideToolbarLink.click(function (e) {
+                e.preventDefault();
+                $toolbar.slideDown().hide();
+                $toolbarHidden.show();
+            });
             this.$boundModelSelect = $("<select>");
             this.$boundModelSelect.change(function (e) {
                 var $selectedOption = that.$boundModelSelect.find(":selected");

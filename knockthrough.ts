@@ -8,6 +8,8 @@ module knockthrough {
 
     export class monitorOptions {
         ko: any;
+        enableObservableWatch: bool = true; // subscribes to all observable changes 
+        logEntries: number = 200; // amount of log entries to keep
     }
     export class ErrorNode {
         message: string;
@@ -63,10 +65,9 @@ module knockthrough {
         }
         private show() {
 
-
-            var dataStr = JSON.stringify((ko.mapping.toJS(this.KoData, {
-                'ignore': ["__ko_mapping__"]
-            })), null, 2);
+            var dataStr = JSON.stringify(ko.toJS(this.KoData), function (key, val) {
+                return key === '__ko_mapping__' ? undefined : val;
+            }, 2);
 
             this.$message.text(this.Message);
 
@@ -92,8 +93,6 @@ module knockthrough {
             this.$container.remove();
         }
     }
-
-
     export class ModelWatch {
 
         rootWatchNode: ModelWatchNode;
@@ -112,6 +111,13 @@ module knockthrough {
         constructor(node, parentName, callback) {
             var that = this;
             for (var prop in node) {
+                if (!node.hasOwnProperty(prop)) continue;
+
+                if (prop === "ko") continue;
+                if (prop === "$root") continue;
+                if (prop === "$parents") continue;
+                if (prop === "$parent") continue;
+                if (prop === "$parentContext") continue;
                 if (ko.isObservable(node[prop])) {
 
                     (function() {
@@ -119,8 +125,8 @@ module knockthrough {
                         var propName = prop;
                         var time = new Date().toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");
                         node[prop].subscribe(function (newValue) {
-                            var alertText = time + " - <span class='kt-watch-data-point-name'>" + parentName + "." + propName + "</span> [from: <span class='kt-watch-data-point-from'>" + currentValue + "</span> to: " + "<span class='kt-watch-data-point-to'>" + newValue + "</span>]";
-
+                            var alertText = time + " - " + "<span class='kt-watch-data-point-name'>" + parentName + "." + propName + "</span>" +
+                                 "<span class='kt-watch-data-points'>[from: <span class='kt-watch-data-point-from'>" + currentValue + "</span> to: " + "<span class='kt-watch-data-point-to'>" + newValue + "</span>]</span>";
                             currentValue = newValue;
                             callback(alertText);
                         });
@@ -160,6 +166,7 @@ module knockthrough {
             this.wireupVisibleMonitor(options);
 
             this.createToolBar();
+
             this.watchApplyBindings();
 
         }
@@ -175,7 +182,7 @@ module knockthrough {
 
         watchApplyBindings() {
             var that = this;
-
+            var addedCount = 0;
             var origApplyBindings = ko.applyBindings;
             var count = 1;
             // override knockouts applybindings - gotta love js
@@ -183,17 +190,27 @@ module knockthrough {
                 // call the original
                 origApplyBindings(viewModel, rootNode);
                 var thisCount = count;
+
                 var name = that.getModelName(viewModel);
                 $("<option>").text("bound model #" + thisCount + " [" + name + "]").data("kt-bound-model", viewModel).appendTo(that.$boundModelSelect);
                 if (that.selectedModel === null) {
                     that.selectedModel = viewModel;
                 }
                 count = count + 1;
-                //var dirtyMonitor = new DirtyMonitor(viewModel);
-                var modelWatch = new ModelWatch(viewModel, name, function (message) {
-                    that.$watchList.prepend($("<li>").html(message));
-                });
-                that.WatchedModels.push(modelWatch);
+                
+                if (that._options.enableObservableWatch) {
+                    var modelWatch = new ModelWatch(viewModel, name, function (message) {
+                        addedCount++;
+
+                        
+                        if (addedCount > that._options.logEntries) {
+                            var last = that.$watchList.find("li:last-child");
+                            last.remove();
+                        }
+                        that.$watchList.prepend("<li>" + message + "</li>");
+                    } );
+                    that.WatchedModels.push(modelWatch);
+                }
             }
 
         }
@@ -210,8 +227,29 @@ module knockthrough {
             var $left = $("<div>").attr("id", "kt-toolbar-left");
             var $right = $("<div>").attr("id", "kt-toolbar-right");
 
-            var $toolbar = $("<div>").attr("id", "kt-toolbar");
+            var $hideToolbarLink = $("<a id='kt-hide-toolbar-link' href='#'>minimize</a>");
 
+            $right.append($hideToolbarLink);
+
+            var $toolbar = $("<div>").attr("id", "kt-toolbar");
+            var $showToolbarLink = $("<a id='kt-show-toolbar-link' href='#'>knockthrough.js</a>");
+
+            var $toolbarHidden = $("<div>").attr("id", "kt-toolbar-hidden").append($showToolbarLink).hide();
+            $toolbarHidden.appendTo("body");
+
+            $showToolbarLink.click(function (e) {
+                e.preventDefault();
+                $toolbarHidden.hide();
+                $toolbar.show();
+            });
+
+            $hideToolbarLink.click(function (e) {
+                e.preventDefault();
+                $toolbar.slideDown().hide();
+                $toolbarHidden.show();
+            });
+
+            
 
             //// select a view model
             this.$boundModelSelect = $("<select>");
@@ -253,6 +291,7 @@ module knockthrough {
             var $logo = $("<div>").attr("id", "kt-logo").append('<a href="https://github.com/JonKragh/knockthrough">knockthrough.js</a> <span>v0.1.3</span> by <a href="http://www.JonKragh.com">Jon Kragh</a>');
 
             $right.append($logo);
+
             $toolbar.append($left);
             $toolbar.append($right);
             $toolbar.appendTo("body");
@@ -265,6 +304,7 @@ module knockthrough {
                     $(this).toggle(isChecked);
                 });
             });
+            
         }
 
         dumpViewModel() {

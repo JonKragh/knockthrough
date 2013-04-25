@@ -47,9 +47,9 @@ Features:
  - Initialize knockthrough **before** you call ko.applyBindings
 
 ##Dependencies
-- jQuery
 - Knockout JS
-- Knockout Mapping Plugin
+- jQuery
+
 
 ```javascript
 
