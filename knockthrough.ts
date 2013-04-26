@@ -19,8 +19,11 @@ module knockthrough {
 
     export class MonitorDialog {
 
-        htmlErrorContainerClass: string = "kt-error-container";
-        htmlErrorMessageClass: string = "kt-error-message";
+        htmlDialogContainerClass: string = "kt-dialog-container";
+        htmlDialogHeaderClass: string = "kt-dialog-header";
+        htmlDialogBodyClass: string = "kt-dialog-body";
+
+        htmlDialogMessageClass: string = "kt-dialog-message";
         htmlContextDumpClass: string = "kt-error-context-dump";
         htmlCloseButtonClass: string = "kt-error-close-btn";
 
@@ -33,17 +36,24 @@ module knockthrough {
 
             var that = this;
             // add the error container
-            this.$message = $('<div>').addClass(this.htmlErrorMessageClass);
+            this.$message = $('<div>').addClass(this.htmlDialogMessageClass);
             this.$contextDump = $('<div>').addClass(this.htmlContextDumpClass);
+            var $dialogHeader = $('<div>').addClass(this.htmlDialogHeaderClass);
+            var $dialogBody = $('<div>').addClass(this.htmlDialogBodyClass);
+
+            var $selectModelLink = $('<a href="#">select model</a>');
+
+            $dialogBody.append(this.$message);
+            $dialogBody.append($selectModelLink);
+            $dialogBody.append(this.$contextDump);
+
             this.$closeButton = $('<a>x</a>').addClass(this.htmlCloseButtonClass);
+            $dialogHeader.append(this.$closeButton);
 
             this.$container = $('<div></div>')
-                .addClass(this.htmlErrorContainerClass)
-                .addClass("kt-error-hover")
-                .append("")
-                .append(this.$closeButton)
-                .append(this.$message)
-                .append(this.$contextDump)
+                .addClass(this.htmlDialogContainerClass)
+                .append($dialogHeader)
+                .append($dialogBody)
                 .hide()
                 .appendTo("body");
 
@@ -51,6 +61,9 @@ module knockthrough {
                 that.close();
             });
 
+            $selectModelLink.click(function (e) {
+                that.selectText(that.$contextDump);
+            });
 
         }
 
@@ -78,8 +91,8 @@ module knockthrough {
                 var $target = $(e.target);
 
                 // ignore clicks on the dialog
-                if ($target.hasClass(that.htmlErrorContainerClass)) return;
-                if ($target.closest("." + that.htmlErrorContainerClass).length > 0) return;
+                if ($target.hasClass(that.htmlDialogContainerClass)) return;
+                if ($target.closest("." + that.htmlDialogContainerClass).length > 0) return;
                 that.close();
             });
         }
@@ -92,6 +105,28 @@ module knockthrough {
         public close() {
             this.$container.remove();
         }
+
+        selectText($element) {
+            var doc = document
+                , element = $element[0]
+                , range, selection;
+
+            var body = <any>doc.body;
+            var doc2 = <any>document.body;
+
+            if (body.createTextRange) {
+                range = doc2.createTextRange();
+                range.moveToElementText(element);
+                range.select();
+            } else if (window.getSelection) {
+                selection = window.getSelection();
+                range = document.createRange();
+                range.selectNodeContents(element);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+
     }
     export class ModelWatch {
 

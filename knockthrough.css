@@ -167,7 +167,7 @@ box-shadow: 0 0 5px #888;
 
 /* the hover error display */
 
-.kt-error-container {
+.kt-dialog-container {
     position: absolute;
     background: #fff;
     display: inline-block;
@@ -178,7 +178,15 @@ box-shadow: 0 0 5px #888;
     overflow-y: scroll;
 }
 
-.kt-error-message {
+.kt-dialog-header {
+    
+}
+
+.kt-dialog-body {
+    
+}
+
+.kt-dialog-message {
     font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
     line-height: 1.6em;

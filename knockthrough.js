@@ -15,19 +15,31 @@ var knockthrough;
     knockthrough.ErrorNode = ErrorNode;    
     var MonitorDialog = (function () {
         function MonitorDialog() {
-            this.htmlErrorContainerClass = "kt-error-container";
-            this.htmlErrorMessageClass = "kt-error-message";
+            this.htmlDialogContainerClass = "kt-dialog-container";
+            this.htmlDialogHeaderClass = "kt-dialog-header";
+            this.htmlDialogBodyClass = "kt-dialog-body";
+            this.htmlDialogMessageClass = "kt-dialog-message";
             this.htmlContextDumpClass = "kt-error-context-dump";
             this.htmlCloseButtonClass = "kt-error-close-btn";
             this.Message = null;
             this.KoData = null;
             var that = this;
-            this.$message = $('<div>').addClass(this.htmlErrorMessageClass);
+            this.$message = $('<div>').addClass(this.htmlDialogMessageClass);
             this.$contextDump = $('<div>').addClass(this.htmlContextDumpClass);
+            var $dialogHeader = $('<div>').addClass(this.htmlDialogHeaderClass);
+            var $dialogBody = $('<div>').addClass(this.htmlDialogBodyClass);
+            var $selectModelLink = $('<a href="#">select model</a>');
+            $dialogBody.append(this.$message);
+            $dialogBody.append($selectModelLink);
+            $dialogBody.append(this.$contextDump);
             this.$closeButton = $('<a>x</a>').addClass(this.htmlCloseButtonClass);
-            this.$container = $('<div></div>').addClass(this.htmlErrorContainerClass).addClass("kt-error-hover").append("").append(this.$closeButton).append(this.$message).append(this.$contextDump).hide().appendTo("body");
+            $dialogHeader.append(this.$closeButton);
+            this.$container = $('<div></div>').addClass(this.htmlDialogContainerClass).append($dialogHeader).append($dialogBody).hide().appendTo("body");
             this.$closeButton.click(function () {
                 that.close();
+            });
+            $selectModelLink.click(function (e) {
+                that.selectText(that.$contextDump);
             });
         }
         MonitorDialog.prototype.showSmall = function (top, left) {
@@ -47,10 +59,10 @@ var knockthrough;
             var that = this;
             $("body").click(function (e) {
                 var $target = $(e.target);
-                if($target.hasClass(that.htmlErrorContainerClass)) {
+                if($target.hasClass(that.htmlDialogContainerClass)) {
                     return;
                 }
-                if($target.closest("." + that.htmlErrorContainerClass).length > 0) {
+                if($target.closest("." + that.htmlDialogContainerClass).length > 0) {
                     return;
                 }
                 that.close();
@@ -67,6 +79,22 @@ var knockthrough;
         };
         MonitorDialog.prototype.close = function () {
             this.$container.remove();
+        };
+        MonitorDialog.prototype.selectText = function ($element) {
+            var doc = document, element = $element[0], range, selection;
+            var body = doc.body;
+            var doc2 = document.body;
+            if(body.createTextRange) {
+                range = doc2.createTextRange();
+                range.moveToElementText(element);
+                range.select();
+            } else if(window.getSelection) {
+                selection = window.getSelection();
+                range = document.createRange();
+                range.selectNodeContents(element);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
         };
         return MonitorDialog;
     })();
