@@ -227,23 +227,25 @@ module knockthrough {
                 var thisCount = count;
 
                 var name = that.getModelName(viewModel);
+                if (name === "") return;
+
                 $("<option>").text("bound model #" + thisCount + " [" + name + "]").data("kt-bound-model", viewModel).appendTo(that.$boundModelSelect);
                 if (that.selectedModel === null) {
                     that.selectedModel = viewModel;
                 }
                 count = count + 1;
-                
+
                 if (that._options.enableObservableWatch) {
                     var modelWatch = new ModelWatch(viewModel, name, function (message) {
                         addedCount++;
 
-                        
+
                         if (addedCount > that._options.logEntries) {
                             var last = that.$watchList.find("li:last-child");
                             last.remove();
                         }
                         that.$watchList.prepend("<li>" + message + "</li>");
-                    } );
+                    });
                     that.WatchedModels.push(modelWatch);
                 }
             }
@@ -284,7 +286,7 @@ module knockthrough {
                 $toolbarHidden.show();
             });
 
-            
+
 
             //// select a view model
             this.$boundModelSelect = $("<select>");
@@ -339,7 +341,7 @@ module knockthrough {
                     $(this).toggle(isChecked);
                 });
             });
-            
+
         }
 
         dumpViewModel() {

@@ -1,13 +1,19 @@
+// knockthrough JavaScript library v0.1.3
+// A utility to debug knockout js
+// (c) Proactive Logic Consulting, Inc - http://proactivelogic.com/
+// License: MIT (http://www.opensource.org/licenses/mit-license.php)
 var knockthrough;
 (function (knockthrough) {
     var monitorOptions = (function () {
         function monitorOptions() {
             this.enableObservableWatch = true;
+            // subscribes to all observable changes
             this.logEntries = 200;
         }
         return monitorOptions;
     })();
     knockthrough.monitorOptions = monitorOptions;    
+    // amount of log entries to keep
     var ErrorNode = (function () {
         function ErrorNode() { }
         return ErrorNode;
@@ -24,6 +30,7 @@ var knockthrough;
             this.Message = null;
             this.KoData = null;
             var that = this;
+            // add the error container
             this.$message = $('<div>').addClass(this.htmlDialogMessageClass);
             this.$contextDump = $('<div>').addClass(this.htmlContextDumpClass);
             var $dialogHeader = $('<div>').addClass(this.htmlDialogHeaderClass);
@@ -59,6 +66,7 @@ var knockthrough;
             var that = this;
             $("body").click(function (e) {
                 var $target = $(e.target);
+                // ignore clicks on the dialog
                 if($target.hasClass(that.htmlDialogContainerClass)) {
                     return;
                 }
@@ -164,6 +172,7 @@ var knockthrough;
             this.$boundModelSelect = null;
             this.$watchList = null;
             this.selectedModel = null;
+            // track all models bound with ko.applyBindings
             this.WatchedModels = [];
             this._options = options;
             var bp = new VisualBindingProvider(this._options.ko);
@@ -180,10 +189,15 @@ var knockthrough;
             var addedCount = 0;
             var origApplyBindings = ko.applyBindings;
             var count = 1;
+            // override knockouts applybindings - gotta love js
             ko.applyBindings = function (viewModel, rootNode) {
+                // call the original
                 origApplyBindings(viewModel, rootNode);
                 var thisCount = count;
                 var name = that.getModelName(viewModel);
+                if(name === "") {
+                    return;
+                }
                 $("<option>").text("bound model #" + thisCount + " [" + name + "]").data("kt-bound-model", viewModel).appendTo(that.$boundModelSelect);
                 if(that.selectedModel === null) {
                     that.selectedModel = viewModel;
@@ -227,11 +241,13 @@ var knockthrough;
                 $toolbar.slideDown().hide();
                 $toolbarHidden.show();
             });
+            //// select a view model
             this.$boundModelSelect = $("<select>");
             this.$boundModelSelect.change(function (e) {
                 var $selectedOption = that.$boundModelSelect.find(":selected");
                 that.selectedModel = $selectedOption.data("kt-bound-model");
             });
+            // dump model
             var $dumpModelCont = $("<div>").attr("id", "kt-dump-model-cont");
             var $dumpModelLink = $("<a href='#'>").attr("id", "kt-dump-model-link").text("dump model").appendTo($dumpModelCont);
             $dumpModelLink.click(function (e) {
@@ -242,13 +258,16 @@ var knockthrough;
             $dumpModelCont.append(this.$boundModelSelect);
             $dumpModelCont.append($dumpModelLink);
             $right.append($dumpModelCont);
+            //// hidden elements
             var $showHiddenCont = $("<div>").attr("id", "kt-toolbar-show-hidden-cont");
             var $showHiddenCheckBox = $('<input id="kt-toolbar-show-hidden-checkbox" type="checkbox" />');
             $showHiddenCont.append($showHiddenCheckBox);
             $showHiddenCont.append('<label for="kt-toolbar-show-hidden-checkbox">show elements hidden by visible bindings</label>');
             $right.append($showHiddenCont);
+            // watch
             this.$watchList = $("<ul>").attr("id", "kt-watch-select-list");
             $left.append(this.$watchList);
+            // logo
             var $logo = $("<div>").attr("id", "kt-logo").append('<a href="https://github.com/JonKragh/knockthrough">knockthrough.js</a> <span>v0.1.3</span> by <a href="http://www.JonKragh.com">Jon Kragh</a>');
             $right.append($logo);
             $toolbar.append($left);
@@ -267,10 +286,12 @@ var knockthrough;
                 var dialog = new MonitorDialog();
                 dialog.Message = "Model Dump";
                 dialog.KoData = this.selectedModel;
+                //dialog.show(Math.floor(window.innerHeight / 2), Math.floor(window.innerWidth / 2));
                 dialog.showFullScreen();
             }
         };
         monitor.prototype.wireupVisibleMonitor = function (options) {
+            /* override the default visible monitor */
             var origVisibleHandler = options.ko.bindingHandlers.visible;
             var that = this;
             options.ko.bindingHandlers.visible = {
@@ -281,9 +302,11 @@ var knockthrough;
                     var isVisible = !(element.style.display == "none");
                     if(isVisible != wasVisible) {
                         var $element = $(element);
+                        // visibility changed
                         if(isVisible) {
                             $element.removeClass(that.hiddenByVisibleBindingClassName);
                         } else {
+                            // add to hidden element list
                             var hidden = element;
                             $element.addClass(that.hiddenByVisibleBindingClassName);
                         }
@@ -345,6 +368,7 @@ var knockthrough;
             return result;
         };
         VisualBindingProvider.prototype.getBindings = function (node, bindingContext) {
+            //return the bindings given a node and the bindingContext
             var result;
             try  {
                 result = this.originalBindingProvider.getBindings(node, bindingContext);
@@ -368,6 +392,7 @@ var knockthrough;
             errorNode.message = e.message;
             errorNode.description = e.description;
             errorNode.stack = e.stack;
+            // the data error
             $node.data("ktErrorDetails", errorNode);
         };
         return VisualBindingProvider;

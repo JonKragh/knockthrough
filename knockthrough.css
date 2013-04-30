@@ -175,7 +175,7 @@ box-shadow: 0 0 5px #888;
     z-index: 9999;
     border-radius: 10px;
     border: solid 3px #ddd;
-    overflow-y: scroll;
+    
 }
 
 .kt-dialog-header {
@@ -183,7 +183,7 @@ box-shadow: 0 0 5px #888;
 }
 
 .kt-dialog-body {
-    
+    overflow-y: scroll;
 }
 
 .kt-dialog-message {
